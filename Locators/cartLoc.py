@@ -17,7 +17,7 @@ class cartLoc:
         
         # Cart page elements
         self.nav_cart = page.locator("[data-test='nav-cart']")
-        self.cart_badge = page.locator(".badge")
+        self.cart_badge = page.locator("[data-test='nav-cart'] .badge")
         self.cart_product_title = page.locator("[data-test='product-title']")
         self.cart_product_quantity = page.locator("[data-test='product-quantity']")
         self.cart_product_price = page.locator("[data-test='product-price']")
