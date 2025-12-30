@@ -114,9 +114,6 @@ python -m pytest tests/test_cart.py -v
 
 # API tests
 python -m pytest test_api.py -v
-
-# Authentication tests
-python -m pytest test_login_playwright.py -v
 ```
 
 ### Run Individual Test
