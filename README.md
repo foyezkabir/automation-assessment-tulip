@@ -1,13 +1,14 @@
 # Automation Assessment Project
 
-A comprehensive test automation framework using Playwright and Selenium with Python for web application testing, featuring authentication state management and Page Object Model pattern.
+A comprehensive test automation framework using Playwright with Python for web application testing, featuring Page Object Model pattern and API testing.
 
 ## 🎯 Project Overview
 
-This project demonstrates automated testing capabilities for two web applications:
-1. **Practice Software Testing** (https://practicesoftwaretesting.com/) - E-commerce testing
+This project demonstrates automated testing capabilities for the Practice Software Testing web application:
+- **Website**: https://practicesoftwaretesting.com/
+- **API**: https://api.practicesoftwaretesting.com/
 
-## 🏗️ Architecture
+## 🏗️ Project Structure
 
 ```
 automation-assessment/
@@ -19,16 +20,12 @@ automation-assessment/
 ├── Pages/                          # Page Object Models
 │   ├── cartPage.py                # Cart & product page actions
 │   └── contactPage.py             # Contact form page actions
-├── tests/                          # Test files
+├── tests/                          # UI test files
 │   ├── test_cart.py               # Cart functionality tests
 │   └── test_contact.py            # Contact form tests
-├── auth_helper.py                  # Authentication utilities
-├── auth_state.json                 # Cached JWT tokens
 ├── conftest.py                     # pytest configuration
-├── test_api.py                     # API tests for messages endpoint
-├── test_login_playwright.py        # Login & storage state tests
-├── test_playwright.py              # Basic Playwright tests
-├── test_selenium.py                # Basic Selenium tests
+├── test_contact_api.py             # API tests for POST messages
+├── test_get_cart_api.py            # API tests for GET carts
 └── requirements.txt                # Python dependencies
 ```
 
@@ -40,13 +37,7 @@ automation-assessment/
 - Combined convenience methods for complex workflows
 - Proper module imports using `sys.path` configuration
 
-### 2. **Authentication State Management**
-- Single login with JWT token caching
-- Reusable authentication across tests
-- Storage state persists: id_token, access_token, refresh_token
-- No repeated login overhead
-
-### 3. **Test Categories**
+### 2. **Test Coverage**
 
 #### Contact Form Tests (`tests/test_contact.py`)
 - ✅ Empty form validation
@@ -54,12 +45,16 @@ automation-assessment/
 - ✅ Error correction workflow
 
 #### Cart Functionality Tests (`tests/test_cart.py`)
-- ✅ Add product to cart and verify
-- ✅ Update cart quantity (1 → 3)
-- ✅ Add multiple quantities directly
-- ✅ Price calculation verification
+- ✅ Add product to cart and verify (1 item)
+- ✅ Add additional quantity (2 more items = 3 total)
+- ✅ Navigate between cart and product pages
+- ✅ Price calculation verification ($14.15 → $42.45)
+- ✅ Cart badge count updates
+- ✅ Update cart quantity from cart page
 
-#### API Tests (`test_api.py`)
+#### API Tests
+
+**POST Messages API** (`test_contact_api.py`)
 - ✅ POST message with valid data
 - ✅ Validation tests for missing fields
 - ✅ Invalid email format handling
@@ -67,34 +62,76 @@ automation-assessment/
 - ✅ Response time verification
 - ✅ Response headers validation
 
+**GET Carts API** (`test_get_cart_api.py`)
+- ✅ Valid cart ID retrieval
+- ✅ Invalid ID format handling
+- ✅ Non-existent cart handling
+- ✅ Response structure validation
+- ✅ Security tests (SQL injection, XSS)
+- ✅ Response time and headers verification
+
 ## 📦 Installation
 
 ### Prerequisites
-- Python 3.12+
+- Python 3.12 or higher
 - pip (Python package manager)
+- Git (for cloning repository)
 
-### Setup
+### Setup Instructions
 
-1. **Clone the repository**
+#### 1. Clone the Repository
 ```bash
 git clone https://github.com/foyezkabir/automation-assessment-tulip.git
 cd automation-assessment-tulip
 ```
 
-2. **Create virtual environment**
+#### 2. Create Virtual Environment
+**Windows:**
 ```bash
 python -m venv venv
-venv\Scripts\activate  # Windows
+venv\Scripts\activate
 ```
 
-3. **Install dependencies**
+**macOS/Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+You should see `(venv)` prefix in your terminal when activated.
+
+#### 3. Install Python Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Install Playwright browsers**
+This will install:
+- playwright 1.57.0
+- pytest 9.0.2
+- pytest-playwright 0.7.2
+- requests 2.32.5
+- And other required packages
+
+#### 4. Install Playwright Browsers
 ```bash
 playwright install chromium
+```
+
+Or install all browsers:
+```bash
+playwright install
+```
+
+#### 5. Verify Installation
+```bash
+# Check Python version
+python --version
+
+# Check pytest installation
+python -m pytest --version
+
+# Check Playwright installation
+playwright --version
 ```
 
 ## 🧪 Running Tests
@@ -112,30 +149,54 @@ python -m pytest tests/test_contact.py -v
 # Cart functionality tests
 python -m pytest tests/test_cart.py -v
 
-# API tests
-python -m pytest test_api.py -v
+# POST Messages API tests
+python -m pytest test_contact_api.py -v
+
+# GET Carts API tests
+python -m pytest test_get_cart_api.py -v
 ```
 
 ### Run Individual Test
 ```bash
+# UI Tests
 python -m pytest tests/test_contact.py::test_contact_form_validation_empty_fields -v
 python -m pytest tests/test_cart.py::test_add_to_cart_and_verify -v
-python -m pytest test_api.py::TestMessagesAPI::test_post_message_success -v
+
+# API Tests
+python -m pytest test_contact_api.py::TestMessagesAPI::test_post_message_success -v
+python -m pytest test_get_cart_api.py::TestCartsGetAPI::test_get_cart_with_valid_id -v
+```
+
+### Run with Different Options
+```bash
+# Run with detailed output
+python -m pytest tests/ -v -s
+
+# Run only failed tests
+python -m pytest --lf -v
+
+# Run and stop on first failure
+python -m pytest -x tests/
+
+# Run with HTML report
+python -m pytest tests/ --html=report.html --self-contained-html
 ```
 
 ## 🔧 Configuration
 
 ### Browser Settings (`conftest.py`)
+Tests run in **headed mode** with slow motion for better visibility:
 ```python
-# Headed mode with slow motion for visibility
-"headless": False
-"slow_mo": 500  # 500ms delay between actions
+"headless": False       # Browser window visible
+"slow_mo": 500         # 500ms delay between actions
 ```
 
-### Authentication Credentials
-- Email: `r8ete3@onemail.host`
-- Password: `Kabir123#`
-- Storage: `auth_state.json`
+To run in headless mode (faster, no UI):
+```python
+# Edit conftest.py
+"headless": True
+"slow_mo": 0
+```
 
 ## 📝 Test Patterns
 
@@ -212,30 +273,31 @@ from Pages.cartPage import CartPage
 ## 📊 Test Results
 
 ### Cart Tests (`tests/test_cart.py`)
-- ✅ `test_add_to_cart_and_verify` - Verifies product appears in cart
-- ✅ `test_update_cart_quantity_and_verify_price` - Updates quantity: 1→3, price: $14.15→$42.45
-- ✅ `test_add_multiple_quantity_to_cart` - Adds 2 items, verifies total: $28.30
+- ✅ `test_add_to_cart_and_verify` - Add 1 item, verify, add 2 more (total 3), verify price updates
+- ✅ `test_update_cart_quantity_and_verify_price` - Update quantity from cart: 1→3, price: $14.15→$42.45
 
 ### Contact Form Tests (`tests/test_contact.py`)
 - ✅ `test_contact_form_validation_empty_fields` - All 5 required field errors shown
 - ✅ `test_contact_form_successful_submission` - Success message displayed
 - ✅ `test_contact_form_validation_and_correction` - Error → Fix → Success flow
 
-### API Tests (`test_api.py`)
-- ✅ `test_post_message_success` - POST message with all fields returns 200 OK
-- ✅ `test_post_message_missing_name` - Handles missing name field
-- ✅ `test_post_message_invalid_email_format` - Validates email format (422)
-- ✅ `test_post_message_response_time` - Response < 3 seconds
-- ✅ `test_post_message_special_characters` - Handles special characters correctly
+### POST Messages API Tests (`test_contact_api.py`)
+- ✅ 13 test cases covering validation, success, error handling
+- ✅ Response time verification (< 3 seconds)
+- ✅ Special characters and edge cases
+
+### GET Carts API Tests (`test_get_cart_api.py`)
+- ✅ 19 test cases covering valid/invalid scenarios
+- ✅ Security testing (SQL injection, XSS attempts)
+- ✅ Response structure and headers validation
 
 ## 🛠️ Technologies Used
 
-- **Playwright** 1.57.0 - Modern browser automation
-- **Selenium** 4.39.0 - Cross-browser testing
-- **pytest** 9.0.2 - Test framework
+- **Playwright** 1.57.0 - Modern browser automation framework
+- **pytest** 9.0.2 - Python testing framework
 - **pytest-playwright** 0.7.2 - Playwright-pytest integration
-- **requests** 2.32.5 - API testing
-- **webdriver-manager** 4.0.2 - Automatic driver management
+- **requests** 2.32.5 - HTTP library for API testing
+- **Python** 3.12+ - Programming language
 
 ## 🐛 Debugging
 
@@ -274,31 +336,36 @@ time.sleep(2)  # Wait for calculation
 
 ## 📚 Project Highlights
 
-### 1. Authentication Optimization
-- **Before**: Login on every test (30+ seconds overhead)
-- **After**: Login once, save state, reuse (instant authentication)
-
-### 2. Organized Structure
+### 1. Organized Structure
 - Clear separation: Locators → Pages → Tests
 - Proper module imports with sys.path configuration
 - Each layer has a single responsibility
+- Tests organized in separate `tests/` folder
 
-### 3. Maintainable Code
+### 2. Maintainable Code
 - Page Objects encapsulate UI interactions
 - Locators separated for easy updates
-- Granular methods + combined helpers
+- Granular methods + combined convenience helpers
+- Reusable fixtures for test setup
 
-### 4. Comprehensive Testing
-- UI Testing: Validation, happy path, error correction
-- API Testing: POST requests, validation, response verification
-- Authentication: Storage state management
-- Price calculation: Dynamic updates and verification
+### 3. Comprehensive Testing
+- **UI Testing**: Validation, happy path, error correction workflows
+- **API Testing**: POST/GET requests, validation, response verification
+- **E-commerce flows**: Cart operations, price calculations, quantity updates
+- **Security testing**: SQL injection and XSS attempts in API tests
 
-### 5. Best Practices
-- Page Object Model pattern
-- Fixture-based test setup
+### 4. Best Practices
+- Page Object Model (POM) pattern
+- Fixture-based test setup with pytest
 - AAA (Arrange-Act-Assert) pattern
 - Specific locator strategies to avoid ambiguity
+- Time delays where needed for UI stability
+
+### 5. Real-World Scenarios
+- Add to cart workflow with multiple steps
+- Cart quantity updates and price recalculation
+- Form validation with error handling
+- API endpoint testing with edge cases
 
 ## 🤝 Contributing
 
