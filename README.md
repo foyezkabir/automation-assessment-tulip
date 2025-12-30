@@ -6,7 +6,6 @@ A comprehensive test automation framework using Playwright and Selenium with Pyt
 
 This project demonstrates automated testing capabilities for two web applications:
 1. **Practice Software Testing** (https://practicesoftwaretesting.com/) - E-commerce testing
-2. **BPRP Production** (https://bprp-prod.shadhinlab.xyz/) - Authentication with AWS Cognito
 
 ## 🏗️ Architecture
 
@@ -14,19 +13,20 @@ This project demonstrates automated testing capabilities for two web application
 automation-assessment/
 ├── .github/
 │   └── copilot-instructions.md    # AI agent guidelines
+├── Locators/                       # Element locator classes
+│   ├── cartLoc.py                 # Cart & product page locators
+│   └── contactLoc.py              # Contact form locators
 ├── Pages/                          # Page Object Models
-│   ├── contactPage.py             # Contact form page actions
-│   └── cartPage.py                # Product & cart page actions
-├── Locators/                       # Element locators (legacy)
-│   ├── contactLoc.py
-│   └── cartLoc.py
+│   ├── cartPage.py                # Cart & product page actions
+│   └── contactPage.py             # Contact form page actions
 ├── tests/                          # Test files
+│   ├── test_cart.py               # Cart functionality tests
 │   └── test_contact.py            # Contact form tests
 ├── auth_helper.py                  # Authentication utilities
 ├── auth_state.json                 # Cached JWT tokens
 ├── conftest.py                     # pytest configuration
+├── test_api.py                     # API tests for messages endpoint
 ├── test_login_playwright.py        # Login & storage state tests
-├── test_cart.py                    # Cart functionality tests
 ├── test_playwright.py              # Basic Playwright tests
 ├── test_selenium.py                # Basic Selenium tests
 └── requirements.txt                # Python dependencies
@@ -35,10 +35,10 @@ automation-assessment/
 ## 🚀 Features
 
 ### 1. **Page Object Model (POM) Pattern**
-- Two-layer architecture: Locators + Page Objects
+- Two-layer architecture: Locators (in `Locators/`) + Page Objects (in `Pages/`)
 - Granular action methods for each UI element
 - Combined convenience methods for complex workflows
-- Direct property access for locators
+- Proper module imports using `sys.path` configuration
 
 ### 2. **Authentication State Management**
 - Single login with JWT token caching
@@ -48,21 +48,24 @@ automation-assessment/
 
 ### 3. **Test Categories**
 
-#### Contact Form Tests (`test_contact.py`)
+#### Contact Form Tests (`tests/test_contact.py`)
 - ✅ Empty form validation
 - ✅ Successful submission with valid data
 - ✅ Error correction workflow
 
-#### Cart Functionality Tests (`test_cart.py`)
+#### Cart Functionality Tests (`tests/test_cart.py`)
 - ✅ Add product to cart and verify
 - ✅ Update cart quantity (1 → 3)
 - ✅ Add multiple quantities directly
 - ✅ Price calculation verification
 
-#### Authentication Tests (`test_login_playwright.py`)
-- ✅ Login and save storage state
-- ✅ Reuse authentication context
-- ✅ Navigate protected routes without login
+#### API Tests (`test_api.py`)
+- ✅ POST message with valid data
+- ✅ Validation tests for missing fields
+- ✅ Invalid email format handling
+- ✅ Special characters support
+- ✅ Response time verification
+- ✅ Response headers validation
 
 ## 📦 Installation
 
@@ -104,10 +107,13 @@ python -m pytest -v
 ### Run Specific Test Files
 ```bash
 # Contact form tests
-python -m pytest test_contact.py -v
+python -m pytest tests/test_contact.py -v
 
 # Cart functionality tests
-python -m pytest test_cart.py -v
+python -m pytest tests/test_cart.py -v
+
+# API tests
+python -m pytest test_api.py -v
 
 # Authentication tests
 python -m pytest test_login_playwright.py -v
@@ -115,7 +121,9 @@ python -m pytest test_login_playwright.py -v
 
 ### Run Individual Test
 ```bash
-python -m pytest test_contact.py::test_contact_form_validation_empty_fields -v
+python -m pytest tests/test_contact.py::test_contact_form_validation_empty_fields -v
+python -m pytest tests/test_cart.py::test_add_to_cart_and_verify -v
+python -m pytest test_api.py::TestMessagesAPI::test_post_message_success -v
 ```
 
 ## 🔧 Configuration
@@ -136,6 +144,12 @@ python -m pytest test_contact.py::test_contact_form_validation_empty_fields -v
 
 ### Fixture-Based Setup
 ```python
+# tests/test_contact.py
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Pages.contactPage import ContactPage
+
 @pytest.fixture
 def contact(page: Page):
     contact_page = ContactPage(page)
@@ -167,34 +181,55 @@ def test_add_to_cart_and_verify(cart: CartPage):
    page.locator("[data-test='add-to-cart']")
    ```
 
-2. **Auth forms**: `get_by_role()` for accessibility
+2. **Specific selectors**: Combine selectors for uniqueness
+   ```python
+   # Cart badge - specific to navigation cart icon
+   page.locator("[data-test='nav-cart'] .badge")
+   ```
+
+3. **Auth forms**: `get_by_role()` for accessibility
    ```python
    page.get_by_role("textbox", name="Email")
    ```
 
-3. **Validation messages**: `get_by_text()` for exact matching
+4. **Validation messages**: `get_by_text()` for exact matching
    ```python
    page.get_by_text("First name is required")
    ```
 
 ### Import Pattern
 ```python
-# Import from root level (not subdirectories)
-from contactPage import ContactPage
-from cartPage import CartPage
+# Page Objects import locators from Locators folder
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Locators.cartLoc import cartLoc
+
+# Test files import from Pages folder
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Pages.cartPage import CartPage
 ```
 
 ## 📊 Test Results
 
-### Cart Tests
+### Cart Tests (`tests/test_cart.py`)
 - ✅ `test_add_to_cart_and_verify` - Verifies product appears in cart
 - ✅ `test_update_cart_quantity_and_verify_price` - Updates quantity: 1→3, price: $14.15→$42.45
 - ✅ `test_add_multiple_quantity_to_cart` - Adds 2 items, verifies total: $28.30
 
-### Contact Form Tests
+### Contact Form Tests (`tests/test_contact.py`)
 - ✅ `test_contact_form_validation_empty_fields` - All 5 required field errors shown
 - ✅ `test_contact_form_successful_submission` - Success message displayed
 - ✅ `test_contact_form_validation_and_correction` - Error → Fix → Success flow
+
+### API Tests (`test_api.py`)
+- ✅ `test_post_message_success` - POST message with all fields returns 200 OK
+- ✅ `test_post_message_missing_name` - Handles missing name field
+- ✅ `test_post_message_invalid_email_format` - Validates email format (422)
+- ✅ `test_post_message_response_time` - Response < 3 seconds
+- ✅ `test_post_message_special_characters` - Handles special characters correctly
 
 ## 🛠️ Technologies Used
 
@@ -202,6 +237,7 @@ from cartPage import CartPage
 - **Selenium** 4.39.0 - Cross-browser testing
 - **pytest** 9.0.2 - Test framework
 - **pytest-playwright** 0.7.2 - Playwright-pytest integration
+- **requests** 2.32.5 - API testing
 - **webdriver-manager** 4.0.2 - Automatic driver management
 
 ## 🐛 Debugging
@@ -213,8 +249,17 @@ Tests run in **headed mode** with 500ms slow motion by default for visibility.
 
 **Import Errors**
 ```bash
-# Solution: Tests must be at root level to import Page Objects
-# Move test files from tests/ to root if needed
+# Solution: Use sys.path to add parent directory
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+```
+
+**Locator Ambiguity**
+```bash
+# Solution: Make locators more specific
+# Bad: page.locator(".badge")  # Matches multiple elements
+# Good: page.locator("[data-test='nav-cart'] .badge")  # Specific to cart
 ```
 
 **Timeout Issues**
@@ -236,16 +281,27 @@ time.sleep(2)  # Wait for calculation
 - **Before**: Login on every test (30+ seconds overhead)
 - **After**: Login once, save state, reuse (instant authentication)
 
-### 2. Maintainable Structure
+### 2. Organized Structure
+- Clear separation: Locators → Pages → Tests
+- Proper module imports with sys.path configuration
+- Each layer has a single responsibility
+
+### 3. Maintainable Code
 - Page Objects encapsulate UI interactions
 - Locators separated for easy updates
 - Granular methods + combined helpers
 
-### 3. Comprehensive Testing
-- Validation testing (negative scenarios)
-- Happy path testing (positive scenarios)
-- Error correction workflows
-- Price calculation verification
+### 4. Comprehensive Testing
+- UI Testing: Validation, happy path, error correction
+- API Testing: POST requests, validation, response verification
+- Authentication: Storage state management
+- Price calculation: Dynamic updates and verification
+
+### 5. Best Practices
+- Page Object Model pattern
+- Fixture-based test setup
+- AAA (Arrange-Act-Assert) pattern
+- Specific locator strategies to avoid ambiguity
 
 ## 🤝 Contributing
 
