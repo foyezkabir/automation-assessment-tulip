@@ -1,0 +1,155 @@
+{
+  "runs": [],
+  "tests": {
+    "test-contact.spec.js::Test Case 1: Verify validation errors on empty form submission": [
+      {
+        "passed": true,
+        "duration": 7080,
+        "timestamp": "2026-01-22T06:27:34.120Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": false,
+        "duration": 55734,
+        "timestamp": "2026-01-22T06:36:18.943Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": true,
+        "duration": 9103,
+        "timestamp": "2026-01-22T06:47:02.430Z",
+        "skipped": false,
+        "retry": 0
+      }
+    ],
+    "test-contact.spec.js::Test Case 2: Verify successful form submission with valid data": [
+      {
+        "passed": true,
+        "duration": 9213,
+        "timestamp": "2026-01-22T06:27:34.120Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": false,
+        "duration": 60514,
+        "timestamp": "2026-01-22T06:36:18.943Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": true,
+        "duration": 4926,
+        "timestamp": "2026-01-22T06:47:02.430Z",
+        "skipped": false,
+        "retry": 0
+      }
+    ],
+    "test-contact.spec.js::Test Case 3: Verify validation errors can be corrected": [
+      {
+        "passed": true,
+        "duration": 7579,
+        "timestamp": "2026-01-22T06:27:34.120Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": false,
+        "duration": 60044,
+        "timestamp": "2026-01-22T06:36:18.943Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": true,
+        "duration": 7160,
+        "timestamp": "2026-01-22T06:47:02.430Z",
+        "skipped": false,
+        "retry": 0
+      }
+    ],
+    "test-cart.spec.js::Test Case 1: Add product to cart, verify, then add multiple quantity": [
+      {
+        "passed": true,
+        "duration": 25599,
+        "timestamp": "2026-01-22T06:27:34.120Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": false,
+        "duration": 14083,
+        "timestamp": "2026-01-22T06:28:29.488Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": false,
+        "duration": 60577,
+        "timestamp": "2026-01-22T06:36:18.943Z",
+        "skipped": false,
+        "retry": 0
+      },
+      {
+        "passed": true,
+        "duration": 23765,
+        "timestamp": "2026-01-22T06:47:02.430Z",
+        "skipped": false,
+        "retry": 0
+      }
+    ]
+  },
+  "summaries": [
+    {
+      "runId": "run-1769063224806",
+      "timestamp": "2026-01-22T06:27:04.806Z",
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "slow": 0,
+      "duration": 29313,
+      "passRate": 100
+    },
+    {
+      "runId": "run-1769063291264",
+      "timestamp": "2026-01-22T06:28:11.264Z",
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "flaky": 0,
+      "slow": 0,
+      "duration": 18225,
+      "passRate": 0
+    },
+    {
+      "runId": "run-1769063586636",
+      "timestamp": "2026-01-22T06:33:06.636Z",
+      "total": 4,
+      "passed": 0,
+      "failed": 4,
+      "skipped": 0,
+      "flaky": 1,
+      "slow": 4,
+      "duration": 192309,
+      "passRate": 0
+    },
+    {
+      "runId": "run-1769064394849",
+      "timestamp": "2026-01-22T06:46:34.849Z",
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 4,
+      "slow": 0,
+      "duration": 27580,
+      "passRate": 100
+    }
+  ],
+  "runFiles": {}
+}

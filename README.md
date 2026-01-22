@@ -1,397 +1,524 @@
-# Automation Assessment Project
+# Automation Assessment - Playwright JavaScript
 
-A comprehensive test automation framework using Playwright with Python for web application testing, featuring Page Object Model pattern and API testing.
+High-performance test automation framework built with **Playwright** and **JavaScript**, featuring Page Object Model architecture, parallel test execution, and enhanced reporting with Smart Reporter.
 
-## 🎯 Project Overview
+## 🎯 Overview
 
-This project demonstrates automated testing capabilities for the Practice Software Testing web application:
-- **Website**: https://practicesoftwaretesting.com/
-- **API**: https://api.practicesoftwaretesting.com/
+This framework provides:
+- **Fast execution** - Optimized test runs with parallel execution
+- **Page Object Model** - Maintainable and reusable test code
+- **Smart Reporting** - Enhanced test reports with visual analytics
+- **Modern async/await** - Clean JavaScript patterns
+- **Multiple browsers** - Chromium, Firefox, WebKit support
 
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```
-automation-assessment/
-├── .github/
-│   └── copilot-instructions.md    # AI agent guidelines
-├── Locators/                       # Element locator classes
-│   ├── cartLoc.py                 # Cart & product page locators
-│   └── contactLoc.py              # Contact form locators
+├── tests/                          # Test suites
+│   ├── test-contact.spec.js       # Contact form validation tests
+│   ├── test-cart.spec.js          # Shopping cart functionality tests
+│   ├── smart-report.html          # Test report dashboard
+│   └── test-history.json          # Test execution history
 ├── Pages/                          # Page Object Models
-│   ├── cartPage.py                # Cart & product page actions
-│   └── contactPage.py             # Contact form page actions
-├── tests/                          # UI test files
-│   ├── test_cart.py               # Cart functionality tests
-│   └── test_contact.py            # Contact form tests
-├── conftest.py                     # pytest configuration
-├── test_contact_api.py             # API tests for POST messages
-├── test_get_cart_api.py            # API tests for GET carts
-└── requirements.txt                # Python dependencies
+│   ├── contactPage.js             # Contact page actions & assertions
+│   └── cartPage.js                # Cart page actions & assertions
+├── Locators/                       # Locator definitions (for complex pages)
+│   └── cartLoc.js                 # Cart page element selectors
+├── playwright.config.js            # Playwright configuration
+├── package.json                    # Node.js dependencies & scripts
+├── node_modules/                   # Dependencies (auto-generated)
+├── playwright-report/              # HTML test reports
+├── test-results/                   # Screenshots, videos, traces
+└── README.md                       # This file
 ```
 
-## 🚀 Features
-
-### 1. **Page Object Model (POM) Pattern**
-- Two-layer architecture: Locators (in `Locators/`) + Page Objects (in `Pages/`)
-- Granular action methods for each UI element
-- Combined convenience methods for complex workflows
-- Proper module imports using `sys.path` configuration
-
-### 2. **Test Coverage**
-
-#### Contact Form Tests (`tests/test_contact.py`)
-- ✅ Empty form validation
-- ✅ Successful submission with valid data
-- ✅ Error correction workflow
-
-#### Cart Functionality Tests (`tests/test_cart.py`)
-- ✅ Add product to cart and verify (1 item)
-- ✅ Add additional quantity (2 more items = 3 total)
-- ✅ Navigate between cart and product pages
-- ✅ Price calculation verification ($14.15 → $42.45)
-- ✅ Cart badge count updates
-- ✅ Update cart quantity from cart page
-
-#### API Tests
-
-**POST Messages API** (`test_contact_api.py`)
-- ✅ POST message with valid data
-- ✅ Validation tests for missing fields
-- ✅ Invalid email format handling
-- ✅ Special characters support
-- ✅ Response time verification
-- ✅ Response headers validation
-
-**GET Carts API** (`test_get_cart_api.py`)
-- ✅ Valid cart ID retrieval
-- ✅ Invalid ID format handling
-- ✅ Non-existent cart handling
-- ✅ Response structure validation
-- ✅ Security tests (SQL injection, XSS)
-- ✅ Response time and headers verification
-
-## 📦 Installation
+## 🔧 Installation
 
 ### Prerequisites
-- Python 3.12 or higher
-- pip (Python package manager)
-- Git (for cloning repository)
+- **Node.js** (v16 or higher recommended)
+- **npm** (comes with Node.js)
 
-### Setup Instructions
-
-#### 1. Clone the Repository
+### Setup Steps
 ```bash
-git clone https://github.com/foyezkabir/automation-assessment-tulip.git
-cd automation-assessment-tulip
+# 1. Install all dependencies
+npm install
+
+# 2. Install Playwright browsers (Chromium, Firefox, WebKit)
+npx playwright install
+
+# 3. Install Smart Reporter (if not already installed)
+npm install playwright-smart-reporter
+
+# 4. Run tests to verify setup
+npm test
+npm run test:headed
+
+# Run specific test file
+npm run test:contact
+npm run test:cart
+
+# Debug mode
+npm run test:debug
+
+# View HTML report
+npm run report
 ```
 
-#### 2. Create Virtual Environment
-**Windows:**
+### Command Line Options
 ```bash
-python -m venv venv
-venv\Scripts\activate
+# Run specific test
+npx playwright test tests/test-contact.spec.js
+
+# Run with UI mode
+npx playwright test --ui
+
+# Run in headed mode
+npx playwright test --headed
+
+# Run with specific browser
+npx playwright test --project=chromium
 ```
 
-**macOS/Linux:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
+## ⚡ Parallel Test Execution
+
+### What is Parallel Execution?
+Parallel execution allows multiple test files to run simultaneously using separate worker processes, significantly reducing total test execution time.
+
+### Benefits
+- **Faster test runs** - Multiple tests execute at the same time
+- **Better resource utilization** - Uses multiple CPU cores
+- **Scalable** - Add more workers as test suite grows
+- **Time savings** - 4 tests in ~27 seconds instead of running sequentially
+
+### How to Configure
+```javascript
+// playwright.config.js
+module.exports = defineConfig({
+  fullyParallel: true,       // Enable parallel execution
+  workers: 2,                 // Number of parallel workers (adjust based on CPU)
+  // workers: process.env.CI ? 1 : 2,  // Use 1 worker in CI, 2 locally
+});
 ```
 
-You should see `(venv)` prefix in your terminal when activated.
+### Worker Configuration Guidelines
+- **2 workers**: Good for local development (4-8 CPU cores)
+- **4 workers**: For machines with 8+ CPU cores
+- **1 worker**: For CI/CD or sequential execution
+- **Auto**: `workers: undefined` - Playwright decides based on CPU count
 
-#### 3. Install Python Dependencies
+### Running Tests in Different Modes
+
 ```bash
-pip install -r requirements.txt
+# Fast mode (headless, parallel) - DEFAULT
+npm test
+
+# Visual mode (headed, see browser)
+npx playwright test --headed
+
+# Debug mode (headed, slow, interactive)
+npm run test:debug
+
+# UI mode (interactive test runner)
+npx playwright test --ui
 ```
 
-This will install:
-- playwright 1.57.0
-- pytest 9.0.2
-- pytest-playwright 0.7.2
-- requests 2.32.5
-- And other required packages
+## 📊 Smart Reporter Integration
 
-#### 4. Install Playwright Browsers
+### Features
+The project integrates `playwright-smart-reporter` for enhanced test reporting:
+
+- **📈 Visual Test Analytics**: Detailed execution metrics and trends
+- **🖼️ Screenshot Capture**: Automatic screenshots on test failure
+- **🎥 Video Recording**: Records video for failed tests
+- **📝 Execution History**: Tracks test results over time via `test-history.json`
+- **🔍 Detailed Logs**: Step-by-step action logs for debugging
+
+### Viewing Reports
+
 ```bash
-playwright install chromium
+# View Smart Report (generated after each test run)
+Start-Process ".\tests\smart-report.html"
+
+# Or open in default browser
+.\tests\smart-report.html
+
+# View standard Playwright HTML report
+npx playwright show-report
 ```
 
-Or install all browsers:
-```bash
-playwright install
-```
-
-#### 5. Verify Installation
-```bash
-# Check Python version
-python --version
-
-# Check pytest installation
-python -m pytest --version
-
-# Check Playwright installation
-playwright --version
-```
+### Report Location
+- **Smart Report**: `tests/smart-report.html`
+- **Standard HTML Report**: `playwright-report/index.html`
+- **Test History**: `tests/test-history.json`
 
 ## 🧪 Running Tests
 
-### Run All Tests
+### Basic Commands
 ```bash
-python -m pytest -v
+# Run all tests (fast mode: headless + parallel)
+npm test
+
+# Run tests with browser visible
+npx playwright test --headed
+
+# Run specific test file
+npx playwright test tests/test-contact.spec.js
+npx playwright test tests/test-cart.spec.js
+
+# Run tests in debug mode (slow + interactive)
+npx playwright test --debug
+
+# Run with UI mode (interactive)
+npx playwright test --ui
+
+# View reports
+npm run report  # Opens last HTML report
 ```
 
-### Run Specific Test Files
-```bash
-# Contact form tests
-python -m pytest tests/test_contact.py -v
-
-# Cart functionality tests
-python -m pytest tests/test_cart.py -v
-
-# POST Messages API tests
-python -m pytest test_contact_api.py -v
-
-# GET Carts API tests
-python -m pytest test_get_cart_api.py -v
+### NPM Scripts
+```json
+{
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:contact": "npx playwright test tests/test-contact",
+    "test:cart": "npx playwright test tests/test-cart",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report"
+  }
+}
 ```
 
-### Run Individual Test
-```bash
-# UI Tests
-python -m pytest tests/test_contact.py::test_contact_form_validation_empty_fields -v
-python -m pytest tests/test_cart.py::test_add_to_cart_and_verify -v
+## 🏗️ Page Object Model Architecture
 
-# API Tests
-python -m pytest test_contact_api.py::TestMessagesAPI::test_post_message_success -v
-python -m pytest test_get_cart_api.py::TestCartsGetAPI::test_get_cart_with_valid_id -v
+### Two-Layer Design Pattern
+
+#### 1. Locators Layer (Optional - for complex pages)
+```javascript
+// Locators/cartLoc.js
+class CartLocators {
+  constructor(page) {
+    this.page = page;
+    this.addToCartBtn = page.locator("[data-test='add-to-cart']");
+    this.cartBadge = page.locator("[data-test='nav-cart'] .badge");
+  }
+}
 ```
 
-### Run with Different Options
-```bash
-# Run with detailed output
-python -m pytest tests/ -v -s
+#### 2. Page Object Layer (Required - actions + assertions)
+```javascript
+// Pages/contactPage.js
+const { expect } = require('@playwright/test');
 
-# Run only failed tests
-python -m pytest --lf -v
+class ContactPage {
+  constructor(page) {
+    this.page = page;
+    this.firstName = page.locator("[data-test='first-name']");
+  }
+  
+  // Granular action methods
+  async fillFirstName(value) {
+    await this.firstName.fill(value);
+  }
+  
+  // Assertion methods
+  async expectFirstNameError() {
+    await expect(this.page.getByText('First name is required')).toBeVisible();
+  }
+  
+  // Combined convenience methods
+  async fillCompleteForm({ firstName, lastName, email, subject, message }) {
+    await this.fillFirstName(firstName);
+    await this.fillLastName(lastName);
+    await this.fillEmail(email);
+    await this.selectSubject(subject);
+    await this.fillMessage(message);
+  }
+}
 
-# Run and stop on first failure
-python -m pytest -x tests/
-
-# Run with HTML report
-python -m pytest tests/ --html=report.html --self-contained-html
+module.exports = { ContactPage };
 ```
 
-## 🔧 Configuration
+## ✍️ Test Writing Patterns
 
-### Browser Settings (`conftest.py`)
-Tests run in **headed mode** with slow motion for better visibility:
-```python
-"headless": False       # Browser window visible
-"slow_mo": 500         # 500ms delay between actions
-```
+### Test Structure (AAA Pattern)
+```javascript
+const { test, expect } = require('@playwright/test');
+const { ContactPage } = require('../Pages/contactPage');
 
-To run in headless mode (faster, no UI):
-```python
-# Edit conftest.py
-"headless": True
-"slow_mo": 0
-```
+## ✍️ Test Writing Patterns
 
-## 📝 Test Patterns
+### Test Structure (AAA Pattern)
+```javascript
+const { test, expect } = require('@playwright/test');
+const { ContactPage } = require('../Pages/contactPage');
 
-### Fixture-Based Setup
-```python
-# tests/test_contact.py
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from Pages.contactPage import ContactPage
+test.describe('Contact Form Tests', () => {
+  let contactPage;
 
-@pytest.fixture
-def contact(page: Page):
-    contact_page = ContactPage(page)
-    contact_page.goto()
-    contact_page.click_nav_contact()
-    return contact_page
-```
+  test.beforeEach(async ({ page }) => {
+    // Setup: Initialize page object and navigate
+    contactPage = new ContactPage(page);
+    await contactPage.goto();
+    await contactPage.clickNavContact();
+  });
 
-### AAA (Arrange-Act-Assert) Pattern
-```python
-def test_add_to_cart_and_verify(cart: CartPage):
-    # Arrange
-    expected_product = "Combination Pliers"
-    expected_price = "$14.15"
+  test('Verify validation errors on empty form submission', async () => {
+    // Arrange - No data needed for empty form test
     
-    # Act
-    cart.goto_combination_pliers()
-    cart.click_add_to_cart()
+    // Act - Submit empty form
+    await contactPage.clickSubmit();
+    await contactPage.page.evaluate(() => window.scrollTo(0, 0));
     
-    # Assert
-    cart.expect_cart_badge_count("1")
+    // Assert - Verify all error messages appear
+    await contactPage.verifyAllRequiredErrors();
+  });
+
+  test('Verify successful form submission with valid data', async () => {
+    // Arrange - Prepare test data
+    const testData = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      subject: 'webmaster',
+      message: 'Test message content'
+    };
+    
+    // Act - Fill and submit form
+    await contactPage.fillCompleteForm(testData);
+    await contactPage.clickSubmit();
+    
+    // Assert - Verify success message
+    await contactPage.expectSuccessMessage();
+  });
+});
 ```
 
-## 🎨 Code Conventions
+## 🎯 Locator Strategy
 
-### Locator Strategy
-1. **Primary**: `data-test` attributes
-   ```python
+Tests use a hierarchy of locator strategies for maximum stability:
+
+1. **Primary: `data-test` attributes** (Most stable)
+   ```javascript
+   page.locator("[data-test='first-name']")
    page.locator("[data-test='add-to-cart']")
    ```
 
-2. **Specific selectors**: Combine selectors for uniqueness
-   ```python
-   # Cart badge - specific to navigation cart icon
-   page.locator("[data-test='nav-cart'] .badge")
+2. **Accessibility roles** (Semantic HTML)
+   ```javascript
+   page.getByRole('button', { name: 'Submit' })
+   page.getByRole('textbox', { name: 'Email' })
    ```
 
-3. **Auth forms**: `get_by_role()` for accessibility
-   ```python
-   page.get_by_role("textbox", name="Email")
+3. **Text content** (For validation messages)
+   ```javascript
+   page.getByText('First name is required')
+   page.getByText('Thanks for your message!')
    ```
 
-4. **Validation messages**: `get_by_text()` for exact matching
-   ```python
-   page.get_by_text("First name is required")
+4. **CSS selectors** (Last resort)
+   ```javascript
+   page.locator('.card-title')
+   page.locator('h1')
    ```
 
-### Import Pattern
-```python
-# Page Objects import locators from Locators folder
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from Locators.cartLoc import cartLoc
+## 🌐 Test Applications
 
-# Test files import from Pages folder
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from Pages.cartPage import CartPage
+### Practice Software Testing Site
+**URL**: `https://practicesoftwaretesting.com/`
+
+#### Contact Form Tests
+- Empty form validation
+- Successful submission with valid data
+- Error correction workflow
+- Field-level validation
+
+#### Shopping Cart Tests
+- Add single item to cart
+- Add multiple quantities
+- Cart badge counter verification
+- Price calculation verification
+
+## ⚙️ Configuration
+
+### Playwright Config Highlights
+```javascript
+// playwright.config.js
+module.exports = defineConfig({
+  testDir: './tests',
+  fullyParallel: true,           // Run tests in parallel
+  workers: 2,                     // Use 2 worker processes
+  
+  reporter: [
+    ['html'],                     // Standard HTML report
+    ['list'],                     // Console output
+    ['playwright-smart-reporter'] // Enhanced smart reporter
+  ],
+  
+  use: {
+    baseURL: 'https://practicesoftwaretesting.com/',
+    trace: 'on-first-retry',      // Trace for debugging
+    screenshot: 'only-on-failure', // Save screenshots on fail
+    video: 'retain-on-failure',   // Save videos on fail
+    actionTimeout: 10000,         // 10s timeout per action
+  },
+  
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        headless: true,           // Fast headless execution
+      }
+    }
+  ]
+});
 ```
 
-## 📊 Test Results
+## 🔧 Troubleshooting
 
-### Cart Tests (`tests/test_cart.py`)
-- ✅ `test_add_to_cart_and_verify` - Add 1 item, verify, add 2 more (total 3), verify price updates
-- ✅ `test_update_cart_quantity_and_verify_price` - Update quantity from cart: 1→3, price: $14.15→$42.45
+### Common Issues & Solutions
 
-### Contact Form Tests (`tests/test_contact.py`)
-- ✅ `test_contact_form_validation_empty_fields` - All 5 required field errors shown
-- ✅ `test_contact_form_successful_submission` - Success message displayed
-- ✅ `test_contact_form_validation_and_correction` - Error → Fix → Success flow
-
-### POST Messages API Tests (`test_contact_api.py`)
-- ✅ 13 test cases covering validation, success, error handling
-- ✅ Response time verification (< 3 seconds)
-- ✅ Special characters and edge cases
-
-### GET Carts API Tests (`test_get_cart_api.py`)
-- ✅ 19 test cases covering valid/invalid scenarios
-- ✅ Security testing (SQL injection, XSS attempts)
-- ✅ Response structure and headers validation
-
-## 🛠️ Technologies Used
-
-- **Playwright** 1.57.0 - Modern browser automation framework
-- **pytest** 9.0.2 - Python testing framework
-- **pytest-playwright** 0.7.2 - Playwright-pytest integration
-- **requests** 2.32.5 - HTTP library for API testing
-- **Python** 3.12+ - Programming language
-
-## 🐛 Debugging
-
-### View Test Execution
-Tests run in **headed mode** with 500ms slow motion by default for visibility.
-
-### Common Issues
-
-**Import Errors**
+#### 1. Module Not Found Errors
 ```bash
-# Solution: Use sys.path to add parent directory
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Solution: Install dependencies
+npm install
 ```
 
-**Locator Ambiguity**
+#### 2. Browser Not Installed
 ```bash
-# Solution: Make locators more specific
-# Bad: page.locator(".badge")  # Matches multiple elements
-# Good: page.locator("[data-test='nav-cart'] .badge")  # Specific to cart
+# Solution: Install Playwright browsers
+npx playwright install
 ```
 
-**Timeout Issues**
-```bash
-# Solution: Use element visibility waits instead of networkidle
-element.wait_for(state="visible", timeout=10000)
+#### 3. Tests Timing Out
+**Possible causes:**
+- Slow network connection
+- Incorrect selectors
+- Page not loading
+
+**Solutions:**
+```javascript
+// Increase timeout in playwright.config.js
+use: {
+  actionTimeout: 20000,  // Increase from 10s to 20s
+}
+
+// Or per-test timeout
+test('My test', async ({ page }) => {
+  test.setTimeout(60000);  // 60 seconds
+  // ...
+});
 ```
 
-**Cart Price Not Updating**
-```bash
-# Solution: Press Tab after quantity change to trigger update
-page.keyboard.press("Tab")
-time.sleep(2)  # Wait for calculation
+#### 4. Tests Fail in Headless But Pass in Headed Mode
+**Common cause:** Timing issues or viewport differences
+
+**Solutions:**
+```javascript
+// Set viewport size explicitly
+use: {
+  viewport: { width: 1920, height: 1080 }
+}
+
+// Use proper waits instead of timeouts
+await page.waitForLoadState('networkidle');
 ```
 
-## 📚 Project Highlights
+#### 5. Import/Export Errors
+This project uses **CommonJS** syntax (not ES6 modules):
+```javascript
+// ✅ Correct
+const { ContactPage } = require('../Pages/contactPage');
+module.exports = { ContactPage };
 
-### 1. Organized Structure
-- Clear separation: Locators → Pages → Tests
-- Proper module imports with sys.path configuration
-- Each layer has a single responsibility
-- Tests organized in separate `tests/` folder
+// ❌ Wrong
+import { ContactPage } from '../Pages/contactPage';
+export { ContactPage };
+```
 
-### 2. Maintainable Code
-- Page Objects encapsulate UI interactions
-- Locators separated for easy updates
-- Granular methods + combined convenience helpers
-- Reusable fixtures for test setup
+## 📚 Key Dependencies
 
-### 3. Comprehensive Testing
-- **UI Testing**: Validation, happy path, error correction workflows
-- **API Testing**: POST/GET requests, validation, response verification
-- **E-commerce flows**: Cart operations, price calculations, quantity updates
-- **Security testing**: SQL injection and XSS attempts in API tests
+```json
+{
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  },
+  "dependencies": {
+    "playwright-smart-reporter": "^1.0.0"
+  }
+}
+```
 
-### 4. Best Practices
-- Page Object Model (POM) pattern
-- Fixture-based test setup with pytest
-- AAA (Arrange-Act-Assert) pattern
-- Specific locator strategies to avoid ambiguity
-- Time delays where needed for UI stability
+### What Each Package Does
 
-### 5. Real-World Scenarios
-- Add to cart workflow with multiple steps
-- Cart quantity updates and price recalculation
-- Form validation with error handling
-- API endpoint testing with edge cases
+- **@playwright/test**: Core Playwright testing framework
+  - Browser automation (Chromium, Firefox, WebKit)
+  - Test runner with parallel execution
+  - Built-in assertions and auto-waiting
+  - Screenshot, video, and trace recording
+
+- **playwright-smart-reporter**: Enhanced test reporting
+  - Visual analytics dashboard
+  - Test history tracking
+  - Detailed execution logs
+  - Smart insights and recommendations
+
+##  Best Practices
+
+### 1. Page Object Methods Should Be Atomic
+```javascript
+// ✅ Good: Single responsibility
+async fillFirstName(value) {
+  await this.firstName.fill(value);
+}
+
+// ❌ Bad: Multiple actions
+async fillFormAndSubmit(data) {
+  await this.fillFirstName(data.firstName);
+  await this.fillLastName(data.lastName);
+  await this.submit();
+}
+```
+
+### 2. Use Descriptive Test Names
+```javascript
+// ✅ Good: Clear intention
+test('Verify validation errors appear on empty form submission', ...)
+
+// ❌ Bad: Vague
+test('Test form', ...)
+```
+
+### 3. Avoid Hardcoded Waits
+```javascript
+// ✅ Good: Smart waits
+await expect(element).toBeVisible();
+await page.waitForURL('**/checkout');
+
+// ❌ Bad: Arbitrary timeouts
+await page.waitForTimeout(3000);
+```
+
+### 4. Use data-test Attributes
+```javascript
+// ✅ Good: Stable selector
+page.locator("[data-test='submit-button']")
+
+// ⚠️ Fragile: Can break with design changes
+page.locator('.btn.btn-primary.mt-3')
+```
 
 ## 🤝 Contributing
 
-This is an assessment project. For improvements:
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+When adding new tests or features:
+
+1. **Follow the POM pattern**: Create page objects for new pages
+2. **Write descriptive tests**: Use AAA pattern (Arrange, Act, Assert)
+3. **Add proper waits**: Leverage Playwright's auto-waiting
+4. **Use stable locators**: Prefer `data-test` attributes
+5. **Test in both modes**: Verify tests pass in headless and headed
+6. **Update documentation**: Keep README.md current
 
 ## 📄 License
 
-This project is created for educational and assessment purposes.
-
-## 👤 Author
-
-**Foyez Kabir**
-- Email: foyezkabir00@gmail.com
-- GitHub: [@foyezkabir](https://github.com/foyezkabir)
-
-## 🙏 Acknowledgments
-
-- Practice Software Testing website for test environment
-- Playwright and Selenium communities
-- pytest framework contributors
-
----
-
-**Note**: This project demonstrates test automation best practices including Page Object Model, fixture-based testing, and storage state management for authentication.
+ISC

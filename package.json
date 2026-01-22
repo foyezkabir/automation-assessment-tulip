@@ -1,0 +1,27 @@
+{
+    "name": "automation-assessment",
+    "version": "1.0.0",
+    "description": "Playwright test automation framework",
+    "main": "index.js",
+    "scripts": {
+        "test": "npx playwright test",
+        "test:headed": "npx playwright test --headed",
+        "test:contact": "npx playwright test tests/test-contact",
+        "test:cart": "npx playwright test tests/test-cart",
+        "test:debug": "npx playwright test --debug",
+        "report": "npx playwright show-report"
+    },
+    "keywords": [
+        "playwright",
+        "automation",
+        "testing"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@playwright/test": "^1.57.0"
+    },
+    "dependencies": {
+        "playwright-smart-reporter": "^1.0.0"
+    }
+}
